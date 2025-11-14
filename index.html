@@ -249,7 +249,7 @@
 </head>
 <body>
 <div class="container">
-  <h1>Zoek collega op locatie & categorie (MZB 2026)</h1>
+  <h1>Zoek collega op locatie &amp; categorie (MZB 2026)</h1>
   <div class="sub">
     Deze zoekmachine leest direct uit de Google Forms-sheet en berekent een match-percentage op locatie, hoofdcategorie en subcategorie.
   </div>
@@ -648,7 +648,6 @@ function renderResults(list){
         parts.push(`<span class="chip chip-small">${h}</span>`);
       }
     });
-    // losse spec-subcategorieën (als die er zijn)
     const allSubSet = new Set(rec.allSubs);
     Object.values(rec.subsByHead).flat().forEach(s=>allSubSet.delete(s));
     const remainingSubs = Array.from(allSubSet);

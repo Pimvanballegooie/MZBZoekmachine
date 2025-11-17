@@ -264,6 +264,23 @@
     background:#f9fafb;
   }
 
+  /* Huidige selectie */
+  .selection-summary{
+    margin-top:8px;
+    font-size:11px;
+    color:var(--muted);
+    border-top:1px dashed #e5e7eb;
+    padding-top:8px;
+  }
+  .selection-summary-section{
+    margin-bottom:6px;
+  }
+  .selection-summary-title{
+    font-weight:600;
+    margin-bottom:3px;
+    display:block;
+  }
+
   /* RESULTATEN */
   .results-header{
     display:flex;
@@ -328,6 +345,58 @@
     color:#7c2d12;
     display:inline-block;
     margin-top:3px;
+  }
+
+  /* Data-overzicht onderaan */
+  .data-overview{
+    margin-top:8px;
+    font-size:12px;
+  }
+  .data-line{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:4px;
+  }
+  .data-line .label{
+    color:var(--muted);
+  }
+  .data-line .value{
+    font-weight:600;
+  }
+  .data-group{
+    margin-top:10px;
+  }
+  .data-group-title{
+    font-size:12px;
+    font-weight:600;
+    margin-bottom:4px;
+  }
+  .bar-row{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    margin-bottom:4px;
+  }
+  .bar-label{
+    font-size:11px;
+    min-width:90px;
+    color:var(--muted);
+  }
+  .bar-track{
+    flex:1;
+    background:#f3f4f6;
+    border-radius:999px;
+    overflow:hidden;
+    height:8px;
+  }
+  .bar-fill{
+    height:100%;
+    background:var(--accent);
+  }
+  .bar-value{
+    font-size:11px;
+    min-width:28px;
+    text-align:right;
   }
 
   .footer{
@@ -426,6 +495,9 @@
         </div>
 
         <div id="activeFilters" class="active-filters"></div>
+
+        <!-- Huidige selectie visueel -->
+        <div id="selectionSummary" class="selection-summary"></div>
       </div>
 
       <!-- RESULTATEN -->
@@ -447,6 +519,12 @@
           <tbody id="resultsBody"></tbody>
         </table>
       </div>
+    </div>
+
+    <!-- DATA-OVERZICHT ONDERAAN -->
+    <div class="panel" id="dataOverviewPanel">
+      <strong>Data-overzicht</strong>
+      <div id="dataOverview" class="data-overview"></div>
     </div>
 
     <div class="footer">
@@ -499,10 +577,12 @@ const headChipsWrap  = document.getElementById("headChips");
 const subChipsWrap   = document.getElementById("subChips");
 const hideZeroCb     = document.getElementById("hideZero");
 const activeFiltersEl= document.getElementById("activeFilters");
+const selectionSummaryEl = document.getElementById("selectionSummary");
 const resultCountEl  = document.getElementById("resultCount");
 const resultsBody    = document.getElementById("resultsBody");
 const clearFiltersBtn= document.getElementById("clearFilters");
 const exportBtn      = document.getElementById("exportBtn");
+const dataOverviewEl = document.getElementById("dataOverview");
 
 // Helpers
 function setStatus(msg, warn=false){
@@ -668,6 +748,124 @@ function renderActiveFilters(filters){
     : '<span style="color:var(--muted);">Geen filters actief: alle collega’s worden getoond (gesorteerd op match).</span>';
 }
 
+// Huidige selectie onder filters
+function renderSelectionSummary(filters){
+  if(!selectionSummaryEl) return;
+  const sections = [];
+
+  if(filters.locQuery || filters.locList.length){
+    let html = '<div class="selection-summary-section">';
+    html += '<span class="selection-summary-title">Gekozen locatie(s)</span>';
+    const chips = [];
+    if(filters.locQuery){
+      chips.push(`<span class="chip chip-small">${filters.locQuery}</span>`);
+    }
+    if(filters.locList.length){
+      chips.push(...filters.locList.map(l=>`<span class="chip chip-small">${l}</span>`));
+    }
+    html += chips.join(" ");
+    html += '</div>';
+    sections.push(html);
+  }
+
+  if(filters.heads.length){
+    let html = '<div class="selection-summary-section">';
+    html += '<span class="selection-summary-title">Gekozen hoofdcategorie(ën)</span>';
+    html += filters.heads.map(h=>`<span class="chip chip-small chip-head">${h}</span>`).join(" ");
+    html += '</div>';
+    sections.push(html);
+  }
+
+  if(filters.subQuery){
+    let html = '<div class="selection-summary-section">';
+    html += '<span class="selection-summary-title">Subcategorie-zoekterm</span>';
+    html += `<span class="chip chip-small chip-sub">${filters.subQuery}</span>`;
+    html += '</div>';
+    sections.push(html);
+  }
+
+  if(!sections.length){
+    selectionSummaryEl.innerHTML = '<span class="muted">Nog geen selectie gemaakt. Kies een locatie, hoofdcategorie of subcategorie.</span>';
+  } else {
+    selectionSummaryEl.innerHTML = `<div style="font-weight:600;margin-bottom:4px;">Huidige selectie</div>${sections.join("")}`;
+  }
+}
+
+// Data-overzicht onderaan
+function renderDataOverview(list, filters){
+  if(!dataOverviewEl) return;
+  const totalUnique = RECORDS.length;
+  const currentCount = list.length;
+
+  const parts = [];
+
+  // Basisregels
+  parts.push(
+    `<div class="data-line"><span class="label">Totaal aantal collega's in overzicht</span><span class="value">${totalUnique}</span></div>`
+  );
+  parts.push(
+    `<div class="data-line"><span class="label">Aantal collega's in huidige selectie</span><span class="value">${currentCount}</span></div>`
+  );
+
+  // Locaties (alleen tonen als er iets met locatie gefilterd is)
+  if((filters.locList && filters.locList.length) || filters.locQuery){
+    const locCounts = new Map();
+    list.forEach(({rec})=>{
+      rec.locations.forEach(loc=>{
+        locCounts.set(loc, (locCounts.get(loc) || 0) + 1);
+      });
+    });
+    if(locCounts.size){
+      const max = Math.max(...locCounts.values());
+      parts.push('<div class="data-group"><div class="data-group-title">Collega’s per locatie (huidige selectie)</div>');
+      locCounts.forEach((count, loc)=>{
+        const width = max ? (count / max) * 100 : 0;
+        parts.push(
+          `<div class="bar-row">
+            <span class="bar-label">${loc}</span>
+            <div class="bar-track"><div class="bar-fill" style="width:${width}%;"></div></div>
+            <span class="bar-value">${count}</span>
+          </div>`
+        );
+      });
+      parts.push('</div>');
+    }
+  }
+
+  // Hoofdcategorieën (alleen tonen als er hoofdcategorieën zijn geselecteerd)
+  if(filters.heads && filters.heads.length){
+    const headCounts = new Map();
+    list.forEach(({rec})=>{
+      filters.heads.forEach(h=>{
+        if(rec.heads.includes(h)){
+          headCounts.set(h, (headCounts.get(h) || 0) + 1);
+        }
+      });
+    });
+    if(headCounts.size){
+      const max = Math.max(...headCounts.values());
+      parts.push('<div class="data-group"><div class="data-group-title">Collega’s per gekozen hoofdcategorie (huidige selectie)</div>');
+      headCounts.forEach((count, head)=>{
+        const width = max ? (count / max) * 100 : 0;
+        parts.push(
+          `<div class="bar-row">
+            <span class="bar-label">${head}</span>
+            <div class="bar-track"><div class="bar-fill" style="width:${width}%;"></div></div>
+            <span class="bar-value">${count}</span>
+          </div>`
+        );
+      });
+      parts.push('</div>');
+    }
+  }
+
+  if(!parts.length){
+    dataOverviewEl.innerHTML = '<span class="muted">Nog geen data beschikbaar.</span>';
+  } else {
+    dataOverviewEl.innerHTML = parts.join("");
+  }
+}
+
 // Match-berekening
 function computeMatchScore(rec,filters){
   const {locQuery,locList,heads,subQuery} = filters;
@@ -720,6 +918,8 @@ function applyFilters(){
     nameQuery:nameQueryInput.value.trim()
   };
   renderActiveFilters(filters);
+  renderSelectionSummary(filters);
+
   const hideZero = hideZeroCb.checked;
 
   const enriched = RECORDS.map(rec=>{
@@ -739,6 +939,7 @@ function applyFilters(){
     .sort((a,b)=>b.score - a.score || a.rec.name.localeCompare(b.rec.name,"nl"));
 
   renderResults(filtered);
+  renderDataOverview(filtered, filters);
 }
 
 function renderResults(list){

@@ -133,7 +133,7 @@
     border-radius:999px;
     border:1px solid #d1d5db;
     background:#ffffff;
-    color:#var(--text);
+    color:var(--text);
     font-size:13px;
     cursor:pointer;
     white-space:nowrap;
@@ -213,6 +213,17 @@
   .chip-small{
     font-size:10px;
     padding:3px 8px;
+  }
+
+  /* Nieuwe stijlen voor hoofd- en subcategorie in resultaten */
+  .chip-head{
+    border-color:var(--accent);
+    background:var(--accent-soft);
+    color:#7c2d12;
+    font-weight:600;
+  }
+  .chip-sub{
+    opacity:0.95;
   }
 
   .filters-grid{
@@ -407,7 +418,7 @@
           <input id="nameQuery" type="text" placeholder="Naam, trefwoord, etc." />
         </div>
 
-        <div class="controls-row" style="margin-top:10px;">
+        <div class="controls-row" style="margin-top:10px%;">
           <button id="clearFilters" class="btn small">Wis filters</button>
           <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);">
             <input type="checkbox" id="hideZero" style="width:auto;margin:0;"> Verberg 0% matches
@@ -748,12 +759,12 @@ function renderResults(list){
       if(subs.length){
         parts.push(
           `<div style="margin-bottom:4px;">
-            <span class="chip chip-small">${h}</span>
-            ${subs.map(s=>`<span class="chip chip-small">${s}</span>`).join(" ")}
+            <span class="chip chip-small chip-head">${h}</span>
+            ${subs.map(s=>`<span class="chip chip-small chip-sub">${s}</span>`).join(" ")}
           </div>`
         );
       } else {
-        parts.push(`<span class="chip chip-small">${h}</span>`);
+        parts.push(`<span class="chip chip-small chip-head">${h}</span>`);
       }
     });
     const allSubSet = new Set(rec.allSubs);
@@ -762,8 +773,8 @@ function renderResults(list){
     if(remainingSubs.length){
       parts.push(
         `<div style="margin-top:4px;">
-          <span class="chip chip-small">Specifieke behandelingen</span>
-          ${remainingSubs.map(s=>`<span class="chip chip-small">${s}</span>`).join(" ")}
+          <span class="chip chip-small chip-head">Specifieke behandelingen</span>
+          ${remainingSubs.map(s=>`<span class="chip chip-small chip-sub">${s}</span>`).join(" ")}
         </div>`
       );
     }

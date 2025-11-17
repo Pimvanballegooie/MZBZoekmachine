@@ -437,10 +437,37 @@
 .usage-visible{
   margin-top:8px;
 }
+/* Achtergrondvideo achter hele pagina */
+#bgVideo{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    object-fit:cover;
+    z-index:-2; 
+    filter:blur(4px) brightness(60%); /* video vaag + donkerder */
+}
+
+/* Donkere overlay */
+body::after{
+    content:"";
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    background:rgba(0,0,0,0.35); /* 35% donkere laag */
+    z-index:-1;
+}
+
   
 </style>
 </head>
 <body>
+  <video id="bgVideo" autoplay muted loop playsinline>
+  <source src="https://github.com/Pimvanballegooie/MZBZoekmachine/blob/c2d8dc62da6ceea31ff3837e30f908f884f964be/VidSmallOefenzaal.mp4?raw=1" type="video/mp4">
+</video>
 <div class="page-wrap">
   <div class="container">
 
@@ -1117,6 +1144,7 @@ function toggleUsage(){
 </script>
 </body>
 </html>
+
 
 
 

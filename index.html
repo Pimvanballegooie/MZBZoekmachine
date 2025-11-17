@@ -465,13 +465,6 @@
     <div class="panel">
   <strong>Gebruik van de zoekmachine</strong>
 
-  <!-- Uitklapbare header -->
-<div class="usage-toggle" onclick="toggleUsage()">
-    <span id="usageText">Lees verder</span>
-    <span id="usageArrow" class="usage-arrow">▼</span>
-</div>
-
-
   <!-- Eerste alinea is altijd zichtbaar -->
   <div class="usage-visible">
     <span class="muted">
@@ -481,8 +474,43 @@
       Als een collega 1 (of meerdere) subcategorieën heeft, is de collega
       automatisch onderdeel van de hoofdcategorie.
     </span>
-  </div>
+<!-- Eerste alinea blijft staan -->
+<div class="usage-visible">
+  <span class="muted">
+    De categorieën zijn opgedeeld in 8 hoofd categorieën (Kinder, Geriatrie,
+    Psychosociaal, Chronische Zorg, Wervelkolom, Benen, Armen, Specifieke
+    behandelingen). Onder elke hoofdcategorie vallen verschillende subcategorieën.
+    Als een collega 1 (of meerdere) subcategorieën heeft, is de collega automatisch
+    onderdeel van de hoofdcategorie.
+  </span>
+</div>
 
+<!-- UITKLAPBARE KNOP NU HIER -->
+<div class="usage-toggle" onclick="toggleUsage()">
+  <span id="usageText">Lees verder</span>
+  <span id="usageArrow" class="usage-arrow">▼</span>
+</div>
+
+<!-- Verborgen tekst hieronder -->
+<div id="usageHidden" class="usage-hidden">
+  <br>
+  <span class="muted">
+    Voorbeeld 1: Pim doet aan "Valpreventie" (subcategorie van de
+    hoofdcategorie "Geriatrie"). Als specialisme staat er bij Pim "Geriatie"
+    en "Valpreventie".
+    <br><br>
+    Voorbeeld 2: Pim is gespecialiseerd in "Knie/ onderbeen", de
+    subcategorie onder hoofdcategoie "Benen".
+    <br><br>
+    Om de juiste collega te vinden, willen we een collega op de juiste
+    locatie, met het liefst de juiste subcategorie. De beste "match" wordt
+    weergegeven in procenten (%). Soms is de locatie voor iemand niet
+    belangrijk, maar de juiste specialisatie des te meer. Als je vragen
+    hebt, altijd eerste overleggen ;-)
+  </span>
+</div>    
+  </div>
+      
   <!-- Verborgen deel (klapt uit met pijl) -->
   <div id="usageHidden" class="usage-hidden">
     <br>
@@ -1115,5 +1143,6 @@ function toggleUsage(){
 </script>
 </body>
 </html>
+
 
 

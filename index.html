@@ -410,6 +410,32 @@
     border-radius:4px;
     font-size:11px;
   }
+/* Uitklapbare tekst voor 'Gebruik van de zoekmachine' */
+.usage-toggle{
+  margin-top:10px;
+  cursor:pointer;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:8px 0;
+  font-size:14px;
+  color:var(--accent);
+  font-weight:600;
+}
+
+.usage-arrow{
+  transition:transform 0.25s ease;
+}
+
+.usage-hidden{
+  display:none;
+  margin-top:6px;
+}
+
+.usage-visible{
+  margin-top:8px;
+}
+  
 </style>
 </head>
 <body>
@@ -435,19 +461,45 @@
 
     <!-- GEBRUIK VAN DE ZOEKMACHINE -->
     <div class="panel">
-      <strong>Gebruik van de zoekmachine</strong><br>
-      <span class="muted">
-        De categorieën zijn opgedeeld in 8 hoofd categorieën (Kinder, Geriatrie, Psychosociaal, Chronische Zorg, Wervelkolom, Benen, Armen, Specifieke behandelingen). 
-        Onder elke hoofdcategorie vallen verschillende subcategorieën. Als een collega 1 (of meerdere) subcategorieën heeft, is de collega automatisch onderdeel van de hoofdcategorie.
-        <br><br>
-        Voorbeeld 1: Pim doet aan "Valpreventie" (subcategorie van de hoofdcategorie "Geriatrie"). Als specialisme staat er bij Pim "Geriatie" en "Valpreventie". 
-        Voorbeeld 2: Pim is gespecialiseerd in "Knie/ onderbeen", de subcategorie onder hoofdcategoie "Benen".
-        <br><br>
-        Om de juiste collega te vinden, willen we een collega op de juiste locatie, met het liefst de juiste subcategorie. De beste "match" wordt weergegeven in procenten (%). 
-        Soms is de locatie voor iemand niet belangrijk, maar de juiste specialisatie des te meer. Als je vragen hebt, altijd eerste overleggen ;-)
-      </span>
-      <div id="status" class="status muted" style="margin-top:6px;"></div>
-    </div>
+  <strong>Gebruik van de zoekmachine</strong>
+
+  <!-- Uitklapbare header -->
+  <div class="usage-toggle" onclick="toggleUsage()">
+    <span>Lees uitleg</span>
+    <span id="usageArrow" class="usage-arrow">▼</span>
+  </div>
+
+  <!-- Eerste alinea is altijd zichtbaar -->
+  <div class="usage-visible">
+    <span class="muted">
+      De categorieën zijn opgedeeld in 8 hoofd categorieën (Kinder, Geriatrie,
+      Psychosociaal, Chronische Zorg, Wervelkolom, Benen, Armen, Specifieke
+      behandelingen). Onder elke hoofdcategorie vallen verschillende subcategorieën.
+      Als een collega 1 (of meerdere) subcategorieën heeft, is de collega
+      automatisch onderdeel van de hoofdcategorie.
+    </span>
+  </div>
+
+  <!-- Verborgen deel (klapt uit met pijl) -->
+  <div id="usageHidden" class="usage-hidden">
+    <br>
+    <span class="muted">
+      Voorbeeld 1: Pim doet aan "Valpreventie" (subcategorie van de hoofdcategorie
+      "Geriatrie"). Als specialisme staat er bij Pim "Geriatie" en "Valpreventie". 
+      <br><br>
+      Voorbeeld 2: Pim is gespecialiseerd in "Knie/ onderbeen", de subcategorie
+      onder hoofdcategoie "Benen".
+      <br><br>
+      Om de juiste collega te vinden, willen we een collega op de juiste locatie,
+      met het liefst de juiste subcategorie. De beste "match" wordt weergegeven in
+      procenten (%). Soms is de locatie voor iemand niet belangrijk, maar de juiste
+      specialisatie des te meer. Als je vragen hebt, altijd eerste overleggen ;-)
+    </span>
+  </div>
+
+  <div id="status" class="status muted" style="margin-top:6px;"></div>
+</div>
+
 
     <div class="layout">
       <!-- FILTERS -->
@@ -1027,6 +1079,19 @@ clearFiltersBtn.addEventListener("click",()=>{
 });
 exportBtn.addEventListener("click",exportCurrentSelection);
 
+function toggleUsage(){
+  const hidden = document.getElementById("usageHidden");
+  const arrow = document.getElementById("usageArrow");
+  
+  if(hidden.style.display === "block"){
+    hidden.style.display = "none";
+    arrow.style.transform = "rotate(0deg)";
+  } else {
+    hidden.style.display = "block";
+    arrow.style.transform = "rotate(180deg)";
+  }
+}
+  
 // Auto-load van jouw sheet
 (async function autoLoad(){
   setStatus("Laden van Google Sheet...", false);
@@ -1044,3 +1109,4 @@ exportBtn.addEventListener("click",exportCurrentSelection);
 </script>
 </body>
 </html>
+

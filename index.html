@@ -49,4 +49,786 @@
     gap:16px;
     margin-bottom:18px;
     background:#111827;             /* donkere achtergrond voor logo */
-    border-radiu
+    border-radius:18px;
+    padding:18px 22px;
+    color:#f9fafb;
+    box-shadow:0 10px 22px rgba(15,23,42,0.28);
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:20px;
+  }
+  .brand-logo{
+    height:60px;
+    max-width:230px;
+  }
+  .brand-text{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  h1{
+    font-size:clamp(22px,2.5vw,30px);
+    margin:0;
+    color:#ffffff;
+  }
+  .sub{
+    color:#d1d5db;
+    font-size:14px;
+    margin:0;
+  }
+
+  /* PANEL / LAYOUT */
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:16px 16px 14px;
+    margin-bottom:14px;
+    box-shadow:0 8px 18px rgba(15,23,42,0.06);
+  }
+
+  label{
+    display:block;
+    font-size:13px;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+
+  input[type="text"], select{
+    width:100%;
+    padding:9px 11px;
+    border-radius:12px;
+    border:1px solid #d1d5db;
+    background:#f9fafb;
+    color:var(--text);
+    font-size:14px;
+    box-sizing:border-box;
+    transition:border-color .15s, box-shadow .15s, background-color .15s;
+  }
+
+  input[type="text"]:focus,
+  select:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 1px var(--accent-soft);
+    background:#ffffff;
+  }
+
+  input::placeholder{
+    color:#9ca3af;
+  }
+
+  .controls-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:8px;
+    align-items:center;
+  }
+
+  .btn{
+    padding:8px 12px;
+    border-radius:999px;
+    border:1px solid #d1d5db;
+    background:#ffffff;
+    color:#var(--text);
+    font-size:13px;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:background-color .15s, border-color .15s, box-shadow .15s, transform .05s;
+  }
+  .btn.small{
+    padding:6px 10px;
+    font-size:12px;
+  }
+  .btn.tiny{
+    padding:4px 10px;
+    font-size:11px;
+  }
+  .btn:hover{
+    background:#f9fafb;
+    border-color:var(--accent);
+    box-shadow:0 2px 6px rgba(15,23,42,0.08);
+  }
+  .btn:active{
+    transform:translateY(1px);
+    box-shadow:none;
+  }
+  .btn.primary{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#ffffff;
+  }
+  .btn.primary:hover{
+    background:#ea580c;
+    border-color:#ea580c;
+  }
+
+  .status{
+    margin-top:4px;
+    font-size:12px;
+  }
+  .status.warn{
+    color:var(--danger);
+  }
+  .status.muted{
+    color:var(--muted);
+  }
+
+  .layout{
+    display:grid;
+    gap:12px;
+  }
+  @media(min-width:980px){
+    .layout{
+      grid-template-columns:1.1fr 1.4fr;
+    }
+  }
+
+  /* CHIPS / FILTERS */
+  .chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:6px;
+  }
+  .chip{
+    border-radius:999px;
+    border:1px solid var(--chip-border);
+    background:var(--chip);
+    padding:4px 9px;
+    font-size:11px;
+  }
+  .chip-toggle{
+    cursor:pointer;
+    user-select:none;
+  }
+  .chip-toggle.active{
+    border-color:var(--accent);
+    background:var(--chip-active);
+    color:#7c2d12;
+  }
+  .chip-small{
+    font-size:10px;
+    padding:3px 8px;
+  }
+
+  .filters-grid{
+    display:grid;
+    gap:10px;
+  }
+  @media(min-width:780px){
+    .filters-grid{
+      grid-template-columns:1fr 1fr;
+    }
+  }
+  .filters-grid-2{
+    display:grid;
+    gap:10px;
+  }
+  @media(min-width:780px){
+    .filters-grid-2{
+      grid-template-columns:1.2fr 1fr;
+    }
+  }
+
+  .muted{
+    color:var(--muted);
+    font-size:12px;
+  }
+
+  .active-filters{
+    margin-top:4px;
+    font-size:11px;
+  }
+  .active-filters span{
+    display:inline-block;
+    padding:2px 7px;
+    border-radius:999px;
+    border:1px solid #e5e7eb;
+    margin-right:4px;
+    margin-bottom:4px;
+    background:#f9fafb;
+  }
+
+  /* RESULTATEN */
+  .results-header{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:4px;
+  }
+  .results-count{
+    font-size:13px;
+    color:var(--muted);
+  }
+  .results-controls{
+    display:flex;
+    gap:8px;
+    align-items:center;
+  }
+
+  table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0 8px;
+    margin-top:6px;
+  }
+  thead th{
+    text-align:left;
+    font-size:11px;
+    color:var(--muted);
+    font-weight:600;
+    padding:0 10px 2px;
+  }
+  tbody tr{
+    background:#ffffff;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 4px 10px rgba(15,23,42,0.04);
+  }
+  tbody td{
+    padding:10px;
+    vertical-align:top;
+    font-size:13px;
+    border-top:1px solid #f3f4f6;
+    border-bottom:1px solid #f3f4f6;
+  }
+  tbody tr td:first-child{
+    border-left:1px solid #f3f4f6;
+  }
+  tbody tr td:last-child{
+    border-right:1px solid #f3f4f6;
+  }
+  .name{
+    font-weight:600;
+    font-size:14px;
+  }
+  .score-pill{
+    font-size:11px;
+    padding:2px 7px;
+    border-radius:999px;
+    border:1px solid var(--accent);
+    background:var(--accent-soft);
+    color:#7c2d12;
+    display:inline-block;
+    margin-top:3px;
+  }
+
+  .footer{
+    margin-top:18px;
+    font-size:11px;
+    color:var(--muted);
+  }
+  code{
+    background:#f3f4f6;
+    padding:2px 4px;
+    border-radius:4px;
+    font-size:11px;
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+  <div class="container">
+
+    <!-- HEADER MET LOGO -->
+    <header class="top-bar">
+      <div class="brand">
+        <img
+          src="https://monne-zorgenbeweging.nl/wp-content/uploads/2020/07/Monne_Logo_2020_Wit-1024x385.png"
+          alt="Monné Zorg & Beweging"
+          class="brand-logo"
+        >
+        <div class="brand-text">
+          <h1> Vind de juiste collega op locatie &amp; categorie (MZB 2026)</h1>
+          <p class="sub">
+            Deze zoekmachine is voor intern gebruik
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <!-- GEBRUIK VAN DE ZOEKMACHINE -->
+    <div class="panel">
+      <strong>Gebruik van de zoekmachine</strong><br>
+      <span class="muted">
+        De categorieën zijn opgedeeld in 8 hoofd categorieën (Kinder, Geriatrie, Psychosociaal, Chronische Zorg, Wervelkolom, Benen, Armen, Specifieke behandelingen). 
+        Onder elke hoofdcategorie vallen verschillende subcategorieën. Als een collega 1 (of meerdere) subcategorieën heeft, is de collega automatisch onderdeel van de hoofdcategorie.
+        <br><br>
+        Voorbeeld 1: Pim doet aan "Valpreventie" (subcategorie van de hoofdcategorie "Geriatrie"). Als specialisme staat er bij Pim "Geriatie" en "Valpreventie". 
+        Voorbeeld 2: Pim is gespecialiseerd in "Knie/ onderbeen", de subcategorie onder hoofdcategoie "Benen".
+        <br><br>
+        Om de juiste collega te vinden, willen we een collega op de juiste locatie, met het liefst de juiste subcategorie. De beste "match" wordt weergegeven in procenten (%). 
+        Soms is de locatie voor iemand niet belangrijk, maar de juiste specialisatie des te meer. Als je vragen hebt, altijd eerste overleggen ;-)
+      </span>
+      <div id="status" class="status muted" style="margin-top:6px;"></div>
+    </div>
+
+    <div class="layout">
+      <!-- FILTERS -->
+      <div class="panel">
+        <div class="filters-grid">
+          <div>
+            <label for="locQuery">Locatie (vrij zoeken)</label>
+            <input id="locQuery" type="text" placeholder="Bijv. Industriekade, Oosterhout, Noord..." />
+            <div class="muted" style="margin-top:4px;">Vrij zoeken; wordt meegenomen in de match-score.</div>
+          </div>
+          <div>
+            <label for="locList">Locatie lijst (klik om te focussen)</label>
+            <select id="locList" multiple size="6" aria-label="Filter op locatie"></select>
+            <div class="muted" style="margin-top:4px;">Gebruik Ctrl/Cmd-klik voor meerdere locaties.</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <label>Hoofdcategorieën (klik om te selecteren)</label>
+          <div id="headChips" class="chips"></div>
+        </div>
+
+        <div style="margin-top:10px;" class="filters-grid-2">
+          <div>
+            <label for="subQuery">Subcategorie (vrij en slim zoeken)</label>
+            <input id="subQuery" type="text" placeholder="Bijv. Valpreventie, Knie, Shockwave..." />
+            <div class="muted" style="margin-top:4px;">Spelfouten worden deels opgevangen (fuzzy matching).</div>
+          </div>
+          <div>
+            <label>Veelvoorkomende subcategorieën</label>
+            <div id="subChips" class="chips"></div>
+          </div>
+        </div>
+
+        <div style="margin-top:10px;">
+          <label for="nameQuery">Zoek op naam / vrije tekst</label>
+          <input id="nameQuery" type="text" placeholder="Naam, trefwoord, etc." />
+        </div>
+
+        <div class="controls-row" style="margin-top:10px;">
+          <button id="clearFilters" class="btn small">Wis filters</button>
+          <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);">
+            <input type="checkbox" id="hideZero" style="width:auto;margin:0;"> Verberg 0% matches
+          </label>
+        </div>
+
+        <div id="activeFilters" class="active-filters"></div>
+      </div>
+
+      <!-- RESULTATEN -->
+      <div class="panel">
+        <div class="results-header">
+          <div id="resultCount" class="results-count">0 resultaten</div>
+          <div class="results-controls">
+            <button id="exportBtn" class="btn tiny">Exporteer selectie naar CSV</button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Collega</th>
+              <th>Locaties</th>
+              <th>Categorieën &amp; subcategorieën</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="footer">
+      Verwachte kolommen in de Google Forms-sheet (zoals in je Excel):<br>
+      <code>Tijdstempel</code>, <code>Wat is je voor- en achternaam?</code>,
+      <code>Op welke locatie(s) werk je? Let op: meerdere locaties mogelijk</code>,
+      de 8 hoofdcategorie-kolommen
+      <code>Kinder (KI)</code>, <code>Geriatrie (GE)</code>, <code>Psychosomatisch (PS)</code>,
+      <code>CZ (Chronische Zorg)</code>, <code>Wervelkolom (WK)</code>, <code>Benen (BE)</code>,
+      <code>Armen (AR)</code>, en
+      <code>Specifieke behandelingen (SpecBeh)</code>.
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== CONFIG: KOLOMNAMEN (exact zoals in je sheet) ===== */
+const NAME_KEY = "Wat is je voor- en achternaam?";
+const LOC_KEY  = "Op welke locatie(s) werk je? Let op: meerdere locaties mogelijk";
+
+const HEAD_KEYS = [
+  "Kinder (KI)",
+  "Geriatrie (GE)",
+  "Psychosomatisch (PS)",
+  "CZ (Chronische Zorg)",
+  "Wervelkolom (WK)",
+  "Benen (BE)",
+  "Armen (AR)"
+];
+
+const SPEC_KEY = "Specifieke behandelingen (SpecBeh)";
+
+// JOUW OPENSHEET-URL
+const DEFAULT_OPENSHEET_URL =
+  "https://opensheet.elk.sh/1Lixz4zd1EfYyRpqMB-5rN5yptCWJ2hxHboDiMulot10/Formulierreacties 1";
+
+// STATE
+let RECORDS = [];
+let ALL_LOCATIONS = [];
+let ALL_SUBS = [];
+let HEAD_META = [];
+
+// DOM
+const statusEl       = document.getElementById("status");
+const locQueryInput  = document.getElementById("locQuery");
+const locList        = document.getElementById("locList");
+const subQueryInput  = document.getElementById("subQuery");
+const nameQueryInput = document.getElementById("nameQuery");
+const headChipsWrap  = document.getElementById("headChips");
+const subChipsWrap   = document.getElementById("subChips");
+const hideZeroCb     = document.getElementById("hideZero");
+const activeFiltersEl= document.getElementById("activeFilters");
+const resultCountEl  = document.getElementById("resultCount");
+const resultsBody    = document.getElementById("resultsBody");
+const clearFiltersBtn= document.getElementById("clearFilters");
+const exportBtn      = document.getElementById("exportBtn");
+
+// Helpers
+function setStatus(msg, warn=false){
+  statusEl.textContent = msg || "";
+  statusEl.className = "status " + (warn ? "warn" : "muted");
+}
+function norm(s){
+  return String(s || "")
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+function splitLocations(v){
+  const raw = String(v||"").trim();
+  if(!raw) return [];
+  return raw.split(/,|\/|;| en /i).map(s=>s.trim()).filter(Boolean);
+}
+function splitSubs(v){
+  const raw = String(v||"").trim();
+  if(!raw) return [];
+  return raw.split(",").map(s=>s.trim()).filter(Boolean);
+}
+function levenshtein(a,b){
+  a=norm(a); b=norm(b);
+  const m=a.length, n=b.length;
+  if(!m) return n;
+  if(!n) return m;
+  const dp = Array.from({length:m+1},()=>Array(n+1).fill(0));
+  for(let i=0;i<=m;i++) dp[i][0]=i;
+  for(let j=0;j<=n;j++) dp[0][j]=j;
+  for(let i=1;i<=m;i++){
+    for(let j=1;j<=n;j++){
+      const cost = a[i-1]===b[j-1] ? 0 : 1;
+      dp[i][j]=Math.min(
+        dp[i-1][j]+1,
+        dp[i][j-1]+1,
+        dp[i-1][j-1]+cost
+      );
+    }
+  }
+  return dp[m][n];
+}
+function fuzzyScore(q,t){
+  q=norm(q); t=norm(t);
+  if(!q || !t) return 0;
+  if(t.includes(q) || q.includes(t)) return 1;
+  const d = levenshtein(q,t);
+  const maxLen = Math.max(q.length,t.length);
+  const sim = 1 - d/maxLen;
+  if(sim>=0.8) return 1;
+  if(sim>=0.6) return 0.6;
+  if(sim>=0.45) return 0.3;
+  return 0;
+}
+function maxFuzzyScore(q,arr){
+  if(!q) return 0;
+  let best=0;
+  for(const t of arr){
+    const s=fuzzyScore(q,t);
+    if(s>best) best=s;
+    if(best===1) break;
+  }
+  return best;
+}
+
+// Records bouwen
+function buildRecords(rows){
+  RECORDS = [];
+  ALL_LOCATIONS = [];
+  ALL_SUBS = [];
+  const subsSet = new Set();
+  HEAD_META = HEAD_KEYS.map(k=>({key:k,label:k}));
+
+  for(const row of rows){
+    const name = (row[NAME_KEY]||"").toString().trim();
+    if(!name) continue;
+
+    const locations = splitLocations(row[LOC_KEY]||"");
+
+    const heads=[];
+    const subsByHead={};
+    const allSubs=[];
+
+    HEAD_KEYS.forEach(headKey=>{
+      const cell=row[headKey];
+      const subs=splitSubs(cell);
+      if(subs.length){
+        heads.push(headKey);
+        subsByHead[headKey]=subs;
+        subs.forEach(s=>{subsSet.add(s); allSubs.push(s);});
+      }
+    });
+
+    const specSubs = splitSubs(row[SPEC_KEY]||"");
+    specSubs.forEach(s=>{subsSet.add(s); allSubs.push(s);});
+
+    ALL_LOCATIONS.push(...locations);
+
+    RECORDS.push({
+      name,
+      locations,
+      heads,
+      subsByHead,
+      allSubs
+    });
+  }
+
+  ALL_LOCATIONS = Array.from(new Set(ALL_LOCATIONS)).sort((a,b)=>a.localeCompare(b,"nl"));
+  ALL_SUBS = Array.from(new Set(subsSet)).sort((a,b)=>a.localeCompare(b,"nl"));
+
+  populateLocationList();
+  renderHeadChips();
+  renderSubChips();
+  applyFilters();
+}
+
+function populateLocationList(){
+  locList.innerHTML="";
+  ALL_LOCATIONS.forEach(loc=>{
+    const opt=document.createElement("option");
+    opt.value=loc;
+    opt.textContent=loc;
+    locList.appendChild(opt);
+  });
+}
+function renderHeadChips(){
+  headChipsWrap.innerHTML="";
+  HEAD_META.forEach(h=>{
+    const chip=document.createElement("span");
+    chip.className="chip chip-toggle";
+    chip.textContent=h.label;
+    chip.dataset.key=h.key;
+    chip.onclick=()=>{chip.classList.toggle("active"); applyFilters();};
+    headChipsWrap.appendChild(chip);
+  });
+}
+function renderSubChips(){
+  subChipsWrap.innerHTML="";
+  ALL_SUBS.slice(0,15).forEach(sub=>{
+    const chip=document.createElement("span");
+    chip.className="chip chip-small chip-toggle";
+    chip.textContent=sub;
+    chip.onclick=()=>{subQueryInput.value=sub; applyFilters();};
+    subChipsWrap.appendChild(chip);
+  });
+}
+function selectedHeads(){
+  return [...headChipsWrap.querySelectorAll(".chip-toggle.active")].map(el=>el.dataset.key);
+}
+function selectedLocations(){
+  return [...locList.selectedOptions].map(o=>o.value);
+}
+function renderActiveFilters(filters){
+  const parts=[];
+  if(filters.locQuery) parts.push(`Locatie: "${filters.locQuery}"`);
+  if(filters.locList.length) parts.push(`Locatie lijst: ${filters.locList.join(" | ")}`);
+  if(filters.heads.length) parts.push(`Hoofdcategorie: ${filters.heads.join(" | ")}`);
+  if(filters.subQuery) parts.push(`Subcategorie: "${filters.subQuery}"`);
+  if(filters.nameQuery) parts.push(`Naam/vrije tekst: "${filters.nameQuery}"`);
+  activeFiltersEl.innerHTML = parts.length
+    ? parts.map(p=>`<span>${p}</span>`).join(" ")
+    : '<span style="color:var(--muted);">Geen filters actief: alle collega’s worden getoond (gesorteerd op match).</span>';
+}
+
+// Match-berekening
+function computeMatchScore(rec,filters){
+  const {locQuery,locList,heads,subQuery} = filters;
+  const W_LOC=0.2, W_HEAD=0.3, W_SUB=0.5;
+
+  if(!locQuery && !locList.length && !heads.length && !subQuery) return 0;
+
+  let maxScore=0, locScore=0, headScore=0, subScore=0;
+
+  // locatie
+  if(locQuery || locList.length){
+    maxScore+=W_LOC;
+    let s=0;
+    if(locQuery) s=Math.max(s,maxFuzzyScore(locQuery,rec.locations));
+    if(locList.length){
+      const selNorm=locList.map(norm);
+      const recNorm=rec.locations.map(norm);
+      if(selNorm.some(v=>recNorm.includes(v))) s=Math.max(s,1);
+    }
+    locScore=W_LOC*s;
+  }
+  // hoofd
+  if(heads.length){
+    maxScore+=W_HEAD;
+    const set=new Set(rec.heads);
+    headScore = heads.some(h=>set.has(h)) ? W_HEAD : 0;
+  }
+  // sub
+  if(subQuery){
+    maxScore+=W_SUB;
+    const s=maxFuzzyScore(subQuery,rec.allSubs);
+    subScore=W_SUB*s;
+  }
+
+  // Speciaal: locatie én sterke submatch => 100%
+  if(locScore>0 && subScore>=W_SUB*0.9) return 100;
+  // Alleen sub gefilterd en sterke match => 100%
+  if(!locQuery && !locList.length && !heads.length && subScore>=W_SUB*0.9) return 100;
+
+  if(maxScore===0) return 0;
+  return Math.round((locScore+headScore+subScore)/maxScore * 100);
+}
+
+function applyFilters(){
+  const filters={
+    locQuery:locQueryInput.value.trim(),
+    locList:selectedLocations(),
+    heads:selectedHeads(),
+    subQuery:subQueryInput.value.trim(),
+    nameQuery:nameQueryInput.value.trim()
+  };
+  renderActiveFilters(filters);
+  const hideZero = hideZeroCb.checked;
+
+  const enriched = RECORDS.map(rec=>{
+    let score=computeMatchScore(rec,filters);
+    if(filters.nameQuery){
+      const hay=[rec.name,...rec.locations,...rec.heads,...rec.allSubs].join(" | ");
+      const s=fuzzyScore(filters.nameQuery,hay);
+      if(s===0) score=-1;
+      else score=Math.min(100,Math.round(score+20*s));
+    }
+    return {rec,score};
+  });
+
+  const filtered = enriched
+    .filter(x=>x.score>=0)
+    .filter(x=>!hideZero || x.score>0)
+    .sort((a,b)=>b.score - a.score || a.rec.name.localeCompare(b.rec.name,"nl"));
+
+  renderResults(filtered);
+}
+
+function renderResults(list){
+  resultsBody.innerHTML="";
+  list.forEach(({rec,score})=>{
+    const tr=document.createElement("tr");
+
+    const tdName=document.createElement("td");
+    tdName.innerHTML=`<div class="name">${rec.name}</div><div class="score-pill">Match: ${score}%</div>`;
+
+    const tdLoc=document.createElement("td");
+    tdLoc.innerHTML=rec.locations.map(l=>`<span class="chip chip-small">${l}</span>`).join(" ");
+
+    const tdCat=document.createElement("td");
+    const parts=[];
+    rec.heads.forEach(h=>{
+      const subs=rec.subsByHead[h]||[];
+      if(subs.length){
+        parts.push(
+          `<div style="margin-bottom:4px;">
+            <span class="chip chip-small">${h}</span>
+            ${subs.map(s=>`<span class="chip chip-small">${s}</span>`).join(" ")}
+          </div>`
+        );
+      } else {
+        parts.push(`<span class="chip chip-small">${h}</span>`);
+      }
+    });
+    const allSubSet = new Set(rec.allSubs);
+    Object.values(rec.subsByHead).flat().forEach(s=>allSubSet.delete(s));
+    const remainingSubs = Array.from(allSubSet);
+    if(remainingSubs.length){
+      parts.push(
+        `<div style="margin-top:4px;">
+          <span class="chip chip-small">Specifieke behandelingen</span>
+          ${remainingSubs.map(s=>`<span class="chip chip-small">${s}</span>`).join(" ")}
+        </div>`
+      );
+    }
+
+    tdCat.innerHTML=parts.join("");
+
+    tr.appendChild(tdName);
+    tr.appendChild(tdLoc);
+    tr.appendChild(tdCat);
+    resultsBody.appendChild(tr);
+  });
+
+  resultCountEl.textContent = `${list.length} resultaat${list.length===1?"":"en"}`;
+}
+
+function exportCurrentSelection(){
+  const rows=[["Naam","Locaties","Hoofdcategorieën + subcategorieën","Match"]];
+
+  [...resultsBody.querySelectorAll("tr")].forEach(tr=>{
+    const name = tr.children[0].querySelector(".name").textContent;
+    const matchText = tr.children[0].querySelector(".score-pill").textContent.replace("Match: ","");
+    const locs = [...tr.children[1].querySelectorAll(".chip")].map(c=>c.textContent).join(" | ");
+    const cats = tr.children[2].innerText.replace(/\n+/g," | ");
+    rows.push([name,locs,cats,matchText]);
+  });
+
+  const csv = rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob=new Blob([csv],{type:"text/csv"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="monne_zoekresultaten_2026.csv";
+  a.click();
+}
+
+// Events
+[locQueryInput,subQueryInput,nameQueryInput].forEach(inp=>{
+  inp.addEventListener("input",applyFilters);
+});
+locList.addEventListener("change",applyFilters);
+hideZeroCb.addEventListener("change",applyFilters);
+clearFiltersBtn.addEventListener("click",()=>{
+  locQueryInput.value="";
+  subQueryInput.value="";
+  nameQueryInput.value="";
+  hideZeroCb.checked=false;
+  [...locList.options].forEach(o=>o.selected=false);
+  [...headChipsWrap.querySelectorAll(".chip-toggle.active")].forEach(c=>c.classList.remove("active"));
+  applyFilters();
+});
+exportBtn.addEventListener("click",exportCurrentSelection);
+
+// Auto-load van jouw sheet
+(async function autoLoad(){
+  setStatus("Laden van Google Sheet...", false);
+  try{
+    const res = await fetch(DEFAULT_OPENSHEET_URL);
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const json = await res.json();
+    setStatus("Data geladen.", false);
+    buildRecords(json);
+  }catch(e){
+    console.error(e);
+    setStatus("Fout: kon de sheet niet laden. Controleer Opensheet-URL.", true);
+  }
+})();
+</script>
+</body>
+</html>

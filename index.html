@@ -412,15 +412,17 @@
   }
 /* Uitklapbare tekst voor 'Gebruik van de zoekmachine' */
 .usage-toggle{
-  margin-top:10px;
+  margin-top:16px;
   cursor:pointer;
   display:flex;
-  justify-content:space-between;
+  justify-content:center;     /* CENTREERT TEKST + PIJL */
   align-items:center;
-  padding:8px 0;
+  gap:8px;
+  padding:10px 0;
   font-size:14px;
   color:var(--accent);
   font-weight:600;
+  border-top:1px solid #e5e7eb;
 }
 
 .usage-arrow{
@@ -464,10 +466,11 @@
   <strong>Gebruik van de zoekmachine</strong>
 
   <!-- Uitklapbare header -->
-  <div class="usage-toggle" onclick="toggleUsage()">
-    <span>Lees uitleg</span>
+<div class="usage-toggle" onclick="toggleUsage()">
+    <span id="usageText">Lees verder</span>
     <span id="usageArrow" class="usage-arrow">▼</span>
-  </div>
+</div>
+
 
   <!-- Eerste alinea is altijd zichtbaar -->
   <div class="usage-visible">
@@ -1082,13 +1085,16 @@ exportBtn.addEventListener("click",exportCurrentSelection);
 function toggleUsage(){
   const hidden = document.getElementById("usageHidden");
   const arrow = document.getElementById("usageArrow");
-  
+  const text = document.getElementById("usageText");
+
   if(hidden.style.display === "block"){
     hidden.style.display = "none";
     arrow.style.transform = "rotate(0deg)";
+    text.textContent = "Lees verder";
   } else {
     hidden.style.display = "block";
     arrow.style.transform = "rotate(180deg)";
+    text.textContent = "Verberg";
   }
 }
   
@@ -1109,4 +1115,5 @@ function toggleUsage(){
 </script>
 </body>
 </html>
+
 

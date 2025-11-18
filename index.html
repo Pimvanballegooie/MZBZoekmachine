@@ -11,7 +11,7 @@
     --panel:#ffffff;
     --muted:#6b7280;
     --text:#111827;
-    --accent:#f97316;          /* Monné-oranje */
+    --accent:#f97316;           /* Monné-oranje */
     --accent-soft:#f973161a;
     --chip:#f3f4f6;
     --chip-border:#e5e7eb;
@@ -20,12 +20,22 @@
     --border:#e5e7eb;
   }
 
-  html,body{
+  /* Basis layout */
+  *, *::before, *::after{
+    box-sizing:border-box;
+  }
+
+  html, body{
     margin:0;
     padding:0;
-    background:var(--bg);
+    background:var(--bg); /* blijft als fallback als video niet laadt */
     color:var(--text);
     font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    min-height:100%;
+  }
+
+  body{
+    position:relative;
   }
 
   .page-wrap{
@@ -215,7 +225,7 @@
     padding:3px 8px;
   }
 
-  /* Nieuwe stijlen voor hoofd- en subcategorie in resultaten */
+  /* Hoofd- en subcategorie in resultaten */
   .chip-head{
     border-color:var(--accent);
     background:var(--accent-soft);
@@ -264,7 +274,7 @@
     background:#f9fafb;
   }
 
-  /* Huidige selectie */
+  /* Huidige selectie onder filters (indien gebruikt) */
   .selection-summary{
     margin-top:8px;
     font-size:11px;
@@ -347,7 +357,7 @@
     margin-top:3px;
   }
 
-  /* Data-overzicht onderaan */
+  /* Data-overzicht onderaan (als je dat later gebruikt) */
   .data-overview{
     margin-top:8px;
     font-size:12px;
@@ -410,35 +420,37 @@
     border-radius:4px;
     font-size:11px;
   }
-/* Uitklapbare tekst voor 'Gebruik van de zoekmachine' */
-.usage-toggle{
-  margin-top:16px;
-  cursor:pointer;
-  display:flex;
-  justify-content:center;     /* CENTREERT TEKST + PIJL */
-  align-items:center;
-  gap:8px;
-  padding:10px 0;
-  font-size:14px;
-  color:var(--accent);
-  font-weight:600;
-  border-top:1px solid #e5e7eb;
-}
 
-.usage-arrow{
-  transition:transform 0.25s ease;
-}
+  /* Uitklapbare tekst voor 'Gebruik van de zoekmachine' */
+  .usage-toggle{
+    margin-top:16px;
+    cursor:pointer;
+    display:flex;
+    justify-content:center;     /* Centreert tekst + pijl */
+    align-items:center;
+    gap:8px;
+    padding:10px 0;
+    font-size:14px;
+    color:var(--accent);
+    font-weight:600;
+    border-top:1px solid #e5e7eb;
+  }
 
-.usage-hidden{
-  display:none;
-  margin-top:6px;
-}
+  .usage-arrow{
+    transition:transform 0.25s ease;
+  }
 
-.usage-visible{
-  margin-top:8px;
-}
-/* Achtergrondvideo achter hele pagina */
-#bgVideo{
+  .usage-hidden{
+    display:none;
+    margin-top:6px;
+  }
+
+  .usage-visible{
+    margin-top:8px;
+  }
+
+  /* Achtergrondvideo achter hele pagina */
+  #bgVideo{
     position:fixed;
     top:0;
     left:0;
@@ -447,10 +459,11 @@
     object-fit:cover;
     z-index:-2; 
     filter:blur(4px) brightness(60%); /* video vaag + donkerder */
-}
+    pointer-events:none;
+  }
 
-/* Donkere overlay */
-body::after{
+  /* Donkere overlay boven de video, onder de content */
+  body::after{
     content:"";
     position:fixed;
     top:0;
@@ -459,10 +472,10 @@ body::after{
     height:100vh;
     background:rgba(0,0,0,0.35); /* 35% donkere laag */
     z-index:-1;
-}
-
-  
+    pointer-events:none;
+  }
 </style>
+
 </head>
 <body>
   <video id="bgVideo" autoplay muted loop playsinline>
@@ -1144,6 +1157,7 @@ function toggleUsage(){
 </script>
 </body>
 </html>
+
 
 
 

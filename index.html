@@ -749,7 +749,7 @@ function maxFuzzyScore(q,arr){
   return best;
 }
 
-// Records bouwen
+// Records bouwen met deduplicatie op NAAM: nieuwste formulier wint
 function buildRecords(rows){
   RECORDS = [];
   ALL_LOCATIONS = [];
@@ -757,33 +757,59 @@ function buildRecords(rows){
   const subsSet = new Set();
   HEAD_META = HEAD_KEYS.map(k=>({key:k,label:k}));
 
-  for(const row of rows){
-    const name = (row[NAME_KEY]||"").toString().trim();
-    if(!name) continue;
+  // Helper: naam normaliseren voor de sleutel
+  function normalizeName(name){
+    return String(name || "")
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, " "); // meerdere spaties -> 1 spatie
+  }
 
-    const locations = splitLocations(row[LOC_KEY]||"");
+  const recMap = new Map(); // key = genormaliseerde naam -> record
 
-    const heads=[];
-    const subsByHead={};
-    const allSubs=[];
+  // We lopen van onder naar boven:
+  // onderste rij = nieuwste formulier = wint
+  for (let i = rows.length - 1; i >= 0; i--) {
+    const row = rows[i];
+    if (!row) continue;
 
-    HEAD_KEYS.forEach(headKey=>{
-      const cell=row[headKey];
-      const subs=splitSubs(cell);
-      if(subs.length){
+    const rawName = (row[NAME_KEY] || "").toString().trim();
+    if (!rawName) continue;
+
+    const key = normalizeName(rawName);
+
+    // Als deze naam al in de map staat, is er al een nieuwere versie → overslaan
+    if (recMap.has(key)) continue;
+
+    const locations = splitLocations(row[LOC_KEY] || "");
+
+    const heads = [];
+    const subsByHead = {};
+    const allSubs = [];
+
+    HEAD_KEYS.forEach(headKey => {
+      const cell = row[headKey];
+      const subs = splitSubs(cell);
+      if (subs.length) {
         heads.push(headKey);
-        subsByHead[headKey]=subs;
-        subs.forEach(s=>{subsSet.add(s); allSubs.push(s);});
+        subsByHead[headKey] = subs;
+        subs.forEach(s => {
+          subsSet.add(s);
+          allSubs.push(s);
+        });
       }
     });
 
-    const specSubs = splitSubs(row[SPEC_KEY]||"");
-    specSubs.forEach(s=>{subsSet.add(s); allSubs.push(s);});
+    const specSubs = splitSubs(row[SPEC_KEY] || "");
+    specSubs.forEach(s => {
+      subsSet.add(s);
+      allSubs.push(s);
+    });
 
     ALL_LOCATIONS.push(...locations);
 
-    RECORDS.push({
-      name,
+    recMap.set(key, {
+      name: rawName,    // oorspronkelijke weergave, niet genormaliseerd
       locations,
       heads,
       subsByHead,
@@ -791,8 +817,13 @@ function buildRecords(rows){
     });
   }
 
-  ALL_LOCATIONS = Array.from(new Set(ALL_LOCATIONS)).sort((a,b)=>a.localeCompare(b,"nl"));
-  ALL_SUBS = Array.from(new Set(subsSet)).sort((a,b)=>a.localeCompare(b,"nl"));
+  // Map -> array
+  RECORDS = Array.from(recMap.values());
+
+  ALL_LOCATIONS = Array.from(new Set(ALL_LOCATIONS))
+    .sort((a,b)=>a.localeCompare(b,"nl"));
+  ALL_SUBS = Array.from(new Set(subsSet))
+    .sort((a,b)=>a.localeCompare(b,"nl"));
 
   populateLocationList();
   renderHeadChips();
@@ -1163,6 +1194,7 @@ function toggleUsage(){
 
 </body>
 </html>
+
 
 
 

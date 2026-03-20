@@ -18,13 +18,9 @@
     --danger:#b91c1c;
     --border:#e5e7eb;
 
-    --green-chip-bg:#e8f5e9;
-    --green-chip-border:#86c28b;
-    --green-chip-text:#166534;
-
-    --green-sub-bg:#f0fdf4;
-    --green-sub-border:#bbf7d0;
-    --green-sub-text:#166534;
+    --match-bg:#e8f5e9;
+    --match-border:#86c28b;
+    --match-text:#166534;
   }
 
   *, *::before, *::after{
@@ -247,21 +243,24 @@
   }
 
   .chip-head{
-    border-color:var(--green-chip-border);
-    background:var(--green-chip-bg);
-    color:var(--green-chip-text);
+    border-color:var(--accent);
+    background:var(--accent-soft);
+    color:#7c2d12;
     font-weight:600;
   }
 
   .chip-sub{
-    border-color:var(--green-sub-border);
-    background:var(--green-sub-bg);
-    color:var(--green-sub-text);
+    border-color:var(--chip-border);
+    background:var(--chip);
+    color:var(--text);
     opacity:0.98;
   }
 
   .chip-match-strong{
-    box-shadow:0 0 0 2px rgba(34,197,94,0.18) inset;
+    border-color:var(--match-border) !important;
+    background:var(--match-bg) !important;
+    color:var(--match-text) !important;
+    box-shadow:0 0 0 2px rgba(34,197,94,0.14) inset;
   }
 
   .filters-grid{
@@ -592,10 +591,9 @@
             subcategorie onder hoofdcategorie "Benen".
             <br><br>
             Om de juiste collega te vinden, willen we een collega op de juiste
-            locatie, met het liefst de juiste subcategorie. De beste "match" wordt
-            weergegeven in procenten (%). Soms is de locatie voor iemand niet
-            belangrijk, maar de juiste specialisatie des te meer. Als je vragen
-            hebt, altijd eerst overleggen ;-)
+            locatie, met het liefst de juiste subcategorie. De beste match wordt
+            weergegeven in procenten. Bij meerdere gekozen categorieën of subcategorieën
+            telt een collega hoger mee naarmate er meer overeenkomsten zijn.
           </span>
         </div>
 
@@ -621,13 +619,13 @@
             <label>Hoofdcategorieën (klik om te selecteren)</label>
             <div id="headChips" class="chips"></div>
             <div class="muted" style="margin-top:4px;">
-              Bij meerdere keuzes wordt de score verdeeld. 2 van 2 = 100%, 1 van 2 = 50%.
+              Bij meerdere keuzes telt elke match proportioneel mee.
             </div>
           </div>
 
           <div style="margin-top:10px;" class="filters-grid-2">
             <div>
-              <label for="subQuery">Subcategorieën (vrij zoeken, meerdere mogelijk)</label>
+              <label for="subQuery">Subcategorieën (meerdere mogelijk)</label>
               <input id="subQuery" type="text" placeholder="Bijv. Valpreventie, Knie, Shockwave..." />
               <div class="muted" style="margin-top:4px;">
                 Gebruik komma’s voor meerdere subcategorieën. Spelfouten worden deels opgevangen.
@@ -782,16 +780,18 @@ function levenshtein(a,b){
   const m = a.length, n = b.length;
   if(!m) return n;
   if(!n) return m;
+
   const dp = Array.from({length:m+1},()=>Array(n+1).fill(0));
   for(let i=0;i<=m;i++) dp[i][0]=i;
   for(let j=0;j<=n;j++) dp[0][j]=j;
+
   for(let i=1;i<=m;i++){
     for(let j=1;j<=n;j++){
       const cost = a[i-1]===b[j-1] ? 0 : 1;
       dp[i][j] = Math.min(
-        dp[i-1][j]+1,
-        dp[i][j-1]+1,
-        dp[i-1][j-1]+cost
+        dp[i-1][j] + 1,
+        dp[i][j-1] + 1,
+        dp[i-1][j-1] + cost
       );
     }
   }
@@ -803,13 +803,15 @@ function fuzzyScore(q,t){
   t = norm(t);
   if(!q || !t) return 0;
   if(t.includes(q) || q.includes(t)) return 1;
+
   const d = levenshtein(q,t);
   const maxLen = Math.max(q.length,t.length);
   const sim = 1 - d/maxLen;
-  if(sim>=0.86) return 1;
-  if(sim>=0.72) return 0.75;
-  if(sim>=0.58) return 0.5;
-  if(sim>=0.46) return 0.25;
+
+  if(sim >= 0.86) return 1;
+  if(sim >= 0.72) return 0.75;
+  if(sim >= 0.58) return 0.5;
+  if(sim >= 0.46) return 0.25;
   return 0;
 }
 
@@ -827,10 +829,9 @@ function bestMatchForQuery(query, arr){
   return { score: best, value: bestValue };
 }
 
-function averageCapped(values){
+function averageScores(values){
   if(!values.length) return 0;
-  const total = values.reduce((a,b)=>a+b,0);
-  return Math.min(1, total / values.length);
+  return values.reduce((a,b)=>a+b,0) / values.length;
 }
 
 function buildRecords(rows){
@@ -838,7 +839,7 @@ function buildRecords(rows){
   ALL_LOCATIONS = [];
   ALL_SUBS = [];
   const subsSet = new Set();
-  HEAD_META = HEAD_KEYS.map(k=>({key:k,label:k}));
+  HEAD_META = HEAD_KEYS.map(k => ({ key:k, label:k }));
 
   function normalizeName(name){
     return String(name || "")
@@ -849,31 +850,29 @@ function buildRecords(rows){
 
   const recMap = new Map();
 
-  for (let i = rows.length - 1; i >= 0; i--) {
+  for(let i = rows.length - 1; i >= 0; i--){
     const row = rows[i];
-    if (!row) continue;
+    if(!row) continue;
 
-    const rawName = (row[NAME_KEY] || "").toString().trim();
-    if (!rawName) continue;
+    const rawName = String(row[NAME_KEY] || "").trim();
+    if(!rawName) continue;
 
-    const key = normalizeName(rawName);
-    if (recMap.has(key)) continue;
+    const mapKey = normalizeName(rawName);
+    if(recMap.has(mapKey)) continue;
 
     const locations = splitLocations(row[LOC_KEY] || "");
-
     const heads = [];
     const subsByHead = {};
     const allSubs = [];
 
     HEAD_KEYS.forEach(headKey => {
-      const cell = row[headKey];
-      const subs = splitSubs(cell);
-      if (subs.length) {
+      const subs = splitSubs(row[headKey] || "");
+      if(subs.length){
         heads.push(headKey);
         subsByHead[headKey] = subs;
-        subs.forEach(s => {
-          subsSet.add(s);
-          allSubs.push(s);
+        subs.forEach(sub => {
+          allSubs.push(sub);
+          subsSet.add(sub);
         });
       }
     });
@@ -881,15 +880,15 @@ function buildRecords(rows){
     const specSubs = splitSubs(row[SPEC_KEY] || "");
     if(specSubs.length){
       subsByHead[SPEC_KEY] = specSubs;
-      specSubs.forEach(s => {
-        subsSet.add(s);
-        allSubs.push(s);
+      specSubs.forEach(sub => {
+        allSubs.push(sub);
+        subsSet.add(sub);
       });
     }
 
     ALL_LOCATIONS.push(...locations);
 
-    recMap.set(key, {
+    recMap.set(mapKey, {
       name: rawName,
       locations,
       heads,
@@ -910,7 +909,7 @@ function buildRecords(rows){
 
 function populateLocationList(){
   locList.innerHTML = "";
-  ALL_LOCATIONS.forEach(loc=>{
+  ALL_LOCATIONS.forEach(loc => {
     const opt = document.createElement("option");
     opt.value = loc;
     opt.textContent = loc;
@@ -920,7 +919,7 @@ function populateLocationList(){
 
 function renderHeadChips(){
   headChipsWrap.innerHTML = "";
-  HEAD_META.forEach(h=>{
+  HEAD_META.forEach(h => {
     const chip = document.createElement("span");
     chip.className = "chip chip-toggle";
     chip.textContent = h.label;
@@ -945,7 +944,7 @@ function appendSubToInput(sub){
 
 function renderSubChips(){
   subChipsWrap.innerHTML = "";
-  ALL_SUBS.slice(0,24).forEach(sub=>{
+  ALL_SUBS.slice(0,24).forEach(sub => {
     const chip = document.createElement("span");
     chip.className = "chip chip-small chip-toggle";
     chip.textContent = sub;
@@ -955,11 +954,11 @@ function renderSubChips(){
 }
 
 function selectedHeads(){
-  return [...headChipsWrap.querySelectorAll(".chip-toggle.active")].map(el=>el.dataset.key);
+  return [...headChipsWrap.querySelectorAll(".chip-toggle.active")].map(el => el.dataset.key);
 }
 
 function selectedLocations(){
-  return [...locList.selectedOptions].map(o=>o.value);
+  return [...locList.selectedOptions].map(o => o.value);
 }
 
 function renderActiveFilters(filters){
@@ -971,12 +970,11 @@ function renderActiveFilters(filters){
   if(filters.nameQuery) parts.push(`Naam/vrije tekst: "${filters.nameQuery}"`);
 
   activeFiltersEl.innerHTML = parts.length
-    ? parts.map(p=>`<span>${escapeHtml(p)}</span>`).join(" ")
-    : '<span style="color:var(--muted);">Geen filters actief: alle collega’s worden getoond (gesorteerd op naam).</span>';
+    ? parts.map(p => `<span>${escapeHtml(p)}</span>`).join(" ")
+    : '<span style="color:var(--muted);">Geen filters actief: alle collega’s worden getoond.</span>';
 }
 
 function renderSelectionSummary(filters){
-  if(!selectionSummaryEl) return;
   const sections = [];
 
   if(filters.locQuery || filters.locList.length){
@@ -987,7 +985,7 @@ function renderSelectionSummary(filters){
       chips.push(`<span class="chip chip-small">${escapeHtml(filters.locQuery)}</span>`);
     }
     if(filters.locList.length){
-      chips.push(...filters.locList.map(l=>`<span class="chip chip-small">${escapeHtml(l)}</span>`));
+      chips.push(...filters.locList.map(l => `<span class="chip chip-small">${escapeHtml(l)}</span>`));
     }
     html += chips.join(" ");
     html += '</div>';
@@ -997,7 +995,7 @@ function renderSelectionSummary(filters){
   if(filters.heads.length){
     let html = '<div class="selection-summary-section">';
     html += '<span class="selection-summary-title">Gekozen hoofdcategorie(ën)</span>';
-    html += filters.heads.map(h=>`<span class="chip chip-small chip-head">${escapeHtml(h)}</span>`).join(" ");
+    html += filters.heads.map(h => `<span class="chip chip-small chip-head">${escapeHtml(h)}</span>`).join(" ");
     html += '</div>';
     sections.push(html);
   }
@@ -1005,21 +1003,17 @@ function renderSelectionSummary(filters){
   if(filters.subQueries.length){
     let html = '<div class="selection-summary-section">';
     html += '<span class="selection-summary-title">Gekozen subcategorie(ën)</span>';
-    html += filters.subQueries.map(s=>`<span class="chip chip-small chip-sub">${escapeHtml(s)}</span>`).join(" ");
+    html += filters.subQueries.map(s => `<span class="chip chip-small chip-sub">${escapeHtml(s)}</span>`).join(" ");
     html += '</div>';
     sections.push(html);
   }
 
-  if(!sections.length){
-    selectionSummaryEl.innerHTML = '<span class="muted">Nog geen selectie gemaakt. Kies een locatie, hoofdcategorie of subcategorie.</span>';
-  } else {
-    selectionSummaryEl.innerHTML = `<div style="font-weight:600;margin-bottom:4px;">Huidige selectie</div>${sections.join("")}`;
-  }
+  selectionSummaryEl.innerHTML = sections.length
+    ? `<div style="font-weight:600;margin-bottom:4px;">Huidige selectie</div>${sections.join("")}`
+    : '<span class="muted">Nog geen selectie gemaakt. Kies een locatie, hoofdcategorie of subcategorie.</span>';
 }
 
 function renderDataOverview(list, filters){
-  if(!dataOverviewEl) return;
-
   const totalUnique = RECORDS.length;
   const currentCount = list.length;
   const parts = [];
@@ -1033,15 +1027,15 @@ function renderDataOverview(list, filters){
 
   if((filters.locList && filters.locList.length) || filters.locQuery){
     const locCounts = new Map();
-    list.forEach(({rec})=>{
-      rec.locations.forEach(loc=>{
+    list.forEach(({rec}) => {
+      rec.locations.forEach(loc => {
         locCounts.set(loc, (locCounts.get(loc) || 0) + 1);
       });
     });
     if(locCounts.size){
       const max = Math.max(...locCounts.values());
       parts.push('<div class="data-group"><div class="data-group-title">Collega’s per locatie (huidige selectie)</div>');
-      locCounts.forEach((count, loc)=>{
+      locCounts.forEach((count, loc) => {
         const width = max ? (count / max) * 100 : 0;
         parts.push(
           `<div class="bar-row">
@@ -1055,10 +1049,10 @@ function renderDataOverview(list, filters){
     }
   }
 
-  if(filters.heads && filters.heads.length){
+  if(filters.heads.length){
     const headCounts = new Map();
-    list.forEach(({rec})=>{
-      filters.heads.forEach(h=>{
+    list.forEach(({rec}) => {
+      filters.heads.forEach(h => {
         if(rec.heads.includes(h)){
           headCounts.set(h, (headCounts.get(h) || 0) + 1);
         }
@@ -1066,8 +1060,8 @@ function renderDataOverview(list, filters){
     });
     if(headCounts.size){
       const max = Math.max(...headCounts.values());
-      parts.push('<div class="data-group"><div class="data-group-title">Collega’s per gekozen hoofdcategorie (huidige selectie)</div>');
-      headCounts.forEach((count, head)=>{
+      parts.push('<div class="data-group"><div class="data-group-title">Collega’s per gekozen hoofdcategorie</div>');
+      headCounts.forEach((count, head) => {
         const width = max ? (count / max) * 100 : 0;
         parts.push(
           `<div class="bar-row">
@@ -1081,10 +1075,10 @@ function renderDataOverview(list, filters){
     }
   }
 
-  if(filters.subQueries && filters.subQueries.length){
+  if(filters.subQueries.length){
     const subCounts = new Map();
-    list.forEach(({rec})=>{
-      filters.subQueries.forEach(q=>{
+    list.forEach(({rec}) => {
+      filters.subQueries.forEach(q => {
         const best = bestMatchForQuery(q, rec.allSubs);
         if(best.score > 0){
           subCounts.set(q, (subCounts.get(q) || 0) + 1);
@@ -1093,8 +1087,8 @@ function renderDataOverview(list, filters){
     });
     if(subCounts.size){
       const max = Math.max(...subCounts.values());
-      parts.push('<div class="data-group"><div class="data-group-title">Collega’s per gekozen subcategorie (huidige selectie)</div>');
-      subCounts.forEach((count, sub)=>{
+      parts.push('<div class="data-group"><div class="data-group-title">Collega’s per gekozen subcategorie</div>');
+      subCounts.forEach((count, sub) => {
         const width = max ? (count / max) * 100 : 0;
         parts.push(
           `<div class="bar-row">
@@ -1108,28 +1102,26 @@ function renderDataOverview(list, filters){
     }
   }
 
-  dataOverviewEl.innerHTML = parts.length
-    ? parts.join("")
-    : '<span class="muted">Nog geen data beschikbaar.</span>';
+  dataOverviewEl.innerHTML = parts.join("");
 }
 
 function computeLocationFraction(rec, filters){
-  const parts = [];
+  const fractions = [];
 
   if(filters.locQuery){
     const best = bestMatchForQuery(filters.locQuery, rec.locations);
-    parts.push(best.score);
+    fractions.push(best.score);
   }
 
   if(filters.locList.length){
     const selectedNorm = filters.locList.map(norm);
     const recNorm = rec.locations.map(norm);
     const matches = selectedNorm.filter(loc => recNorm.includes(loc)).length;
-    parts.push(filters.locList.length ? (matches / filters.locList.length) : 0);
+    fractions.push(matches / filters.locList.length);
   }
 
-  if(!parts.length) return 0;
-  return Math.min(1, Math.max(...parts));
+  if(!fractions.length) return 0;
+  return Math.max(...fractions);
 }
 
 function computeHeadFraction(rec, filters){
@@ -1141,13 +1133,8 @@ function computeHeadFraction(rec, filters){
 
 function computeSubFraction(rec, filters){
   if(!filters.subQueries.length) return 0;
-
-  const scores = filters.subQueries.map(q => {
-    const best = bestMatchForQuery(q, rec.allSubs);
-    return best.score;
-  });
-
-  return averageCapped(scores);
+  const scores = filters.subQueries.map(q => bestMatchForQuery(q, rec.allSubs).score);
+  return averageScores(scores);
 }
 
 function computeMatchScore(rec, filters){
@@ -1160,38 +1147,31 @@ function computeMatchScore(rec, filters){
   const hasSub  = filters.subQueries.length > 0;
 
   if(!hasLoc && !hasHead && !hasSub){
-    return {
-      total: 0,
-      locPct: 0,
-      headPct: 0,
-      subPct: 0
-    };
+    return { total:0, locPct:0, headPct:0, subPct:0 };
   }
-
-  let totalWeight = 0;
-  let weightedScore = 0;
 
   const locFrac = hasLoc ? computeLocationFraction(rec, filters) : 0;
   const headFrac = hasHead ? computeHeadFraction(rec, filters) : 0;
   const subFrac = hasSub ? computeSubFraction(rec, filters) : 0;
 
+  let totalWeight = 0;
+  let weighted = 0;
+
   if(hasLoc){
     totalWeight += W_LOC;
-    weightedScore += locFrac * W_LOC;
+    weighted += locFrac * W_LOC;
   }
   if(hasHead){
     totalWeight += W_HEAD;
-    weightedScore += headFrac * W_HEAD;
+    weighted += headFrac * W_HEAD;
   }
   if(hasSub){
     totalWeight += W_SUB;
-    weightedScore += subFrac * W_SUB;
+    weighted += subFrac * W_SUB;
   }
 
-  const total = totalWeight ? Math.round((weightedScore / totalWeight) * 100) : 0;
-
   return {
-    total,
+    total: totalWeight ? Math.round((weighted / totalWeight) * 100) : 0,
     locPct: Math.round(locFrac * 100),
     headPct: Math.round(headFrac * 100),
     subPct: Math.round(subFrac * 100)
@@ -1200,16 +1180,12 @@ function computeMatchScore(rec, filters){
 
 function getMatchedSubNames(rec, filters){
   const matched = new Set();
-
-  if(filters.subQueries.length){
-    filters.subQueries.forEach(q => {
-      const best = bestMatchForQuery(q, rec.allSubs);
-      if(best.score > 0 && best.value){
-        matched.add(best.value);
-      }
-    });
-  }
-
+  filters.subQueries.forEach(q => {
+    const best = bestMatchForQuery(q, rec.allSubs);
+    if(best.score > 0 && best.value){
+      matched.add(best.value);
+    }
+  });
   return matched;
 }
 
@@ -1235,16 +1211,12 @@ function applyFilters(){
       const candidates = [rec.name, ...rec.locations, ...rec.heads, ...rec.allSubs];
       const best = bestMatchForQuery(filters.nameQuery, candidates);
       if(best.score === 0){
-        return { rec, score: -1, scoreData };
+        return { rec, score:-1, scoreData };
       }
-      totalScore = Math.min(100, Math.round(totalScore + (best.score * 20)));
+      totalScore = Math.min(100, Math.round(totalScore + best.score * 20));
     }
 
-    return {
-      rec,
-      score: totalScore,
-      scoreData
-    };
+    return { rec, score:totalScore, scoreData };
   });
 
   enriched = enriched
@@ -1276,7 +1248,7 @@ function renderResults(list, filters){
       <div class="name">${escapeHtml(rec.name)}</div>
       <div class="score-pill">Match: ${score}%</div>
       <div class="score-breakdown">
-        ${filters.locQuery || filters.locList.length ? `<span class="score-mini">Locatie: ${scoreData.locPct}%</span>` : ""}
+        ${(filters.locQuery || filters.locList.length) ? `<span class="score-mini">Locatie: ${scoreData.locPct}%</span>` : ""}
         ${filters.heads.length ? `<span class="score-mini">Hoofdcategorieën: ${scoreData.headPct}%</span>` : ""}
         ${filters.subQueries.length ? `<span class="score-mini">Subcategorieën: ${scoreData.subPct}%</span>` : ""}
       </div>
@@ -1286,7 +1258,7 @@ function renderResults(list, filters){
     tdLoc.innerHTML = rec.locations.map(l => {
       const strongMatch =
         (filters.locQuery && fuzzyScore(filters.locQuery, l) > 0) ||
-        (filters.locList.some(sel => norm(sel) === norm(l)));
+        filters.locList.some(sel => norm(sel) === norm(l));
       return `<span class="chip chip-small ${strongMatch ? 'chip-match-strong' : ''}">${escapeHtml(l)}</span>`;
     }).join(" ");
 
@@ -1295,20 +1267,24 @@ function renderResults(list, filters){
 
     rec.heads.forEach(h => {
       const subs = rec.subsByHead[h] || [];
-      const headStrong = matchedHeads.has(h);
+      const headMatch = matchedHeads.has(h);
 
       if(subs.length){
         parts.push(`
           <div style="margin-bottom:4px;">
-            <span class="chip chip-small chip-head ${headStrong ? 'chip-match-strong' : ''}">${escapeHtml(h)}</span>
+            <span class="chip chip-small chip-head ${headMatch ? 'chip-match-strong' : ''}">${escapeHtml(h)}</span>
             ${subs.map(s => {
-              const strong = matchedSubs.has(s);
-              return `<span class="chip chip-small chip-sub ${strong ? 'chip-match-strong' : ''}">${escapeHtml(s)}</span>`;
+              const subMatch = matchedSubs.has(s);
+              return `<span class="chip chip-small chip-sub ${subMatch ? 'chip-match-strong' : ''}">${escapeHtml(s)}</span>`;
             }).join(" ")}
           </div>
         `);
       } else {
-        parts.push(`<span class="chip chip-small chip-head ${headStrong ? 'chip-match-strong' : ''}">${escapeHtml(h)}</span>`);
+        parts.push(
+          `<div style="margin-bottom:4px;">
+            <span class="chip chip-small chip-head ${headMatch ? 'chip-match-strong' : ''}">${escapeHtml(h)}</span>
+          </div>`
+        );
       }
     });
 
@@ -1318,15 +1294,14 @@ function renderResults(list, filters){
         <div style="margin-top:4px;">
           <span class="chip chip-small chip-head">Specifieke behandelingen</span>
           ${specSubs.map(s => {
-            const strong = matchedSubs.has(s);
-            return `<span class="chip chip-small chip-sub ${strong ? 'chip-match-strong' : ''}">${escapeHtml(s)}</span>`;
+            const subMatch = matchedSubs.has(s);
+            return `<span class="chip chip-small chip-sub ${subMatch ? 'chip-match-strong' : ''}">${escapeHtml(s)}</span>`;
           }).join(" ")}
         </div>
       `);
     }
 
     tdCat.innerHTML = parts.join("");
-
     tr.appendChild(tdName);
     tr.appendChild(tdLoc);
     tr.appendChild(tdCat);
@@ -1342,12 +1317,12 @@ function exportCurrentSelection(){
   [...resultsBody.querySelectorAll("tr")].forEach(tr => {
     const name = tr.children[0].querySelector(".name").textContent;
     const matchText = tr.children[0].querySelector(".score-pill").textContent.replace("Match: ","");
-    const locs = [...tr.children[1].querySelectorAll(".chip")].map(c=>c.textContent).join(" | ");
+    const locs = [...tr.children[1].querySelectorAll(".chip")].map(c => c.textContent).join(" | ");
     const cats = tr.children[2].innerText.replace(/\n+/g," | ");
     rows.push([name, locs, cats, matchText]);
   });
 
-  const csv = rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const csv = rows.map(r => r.map(x => `"${String(x).replace(/"/g,'""')}"`).join(",")).join("\n");
   const blob = new Blob([csv], {type:"text/csv"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -1355,7 +1330,7 @@ function exportCurrentSelection(){
   a.click();
 }
 
-[locQueryInput, subQueryInput, nameQueryInput].forEach(inp=>{
+[locQueryInput, subQueryInput, nameQueryInput].forEach(inp => {
   inp.addEventListener("input", applyFilters);
 });
 
@@ -1367,8 +1342,8 @@ clearFiltersBtn.addEventListener("click", () => {
   subQueryInput.value = "";
   nameQueryInput.value = "";
   hideZeroCb.checked = true;
-  [...locList.options].forEach(o=>o.selected=false);
-  [...headChipsWrap.querySelectorAll(".chip-toggle.active")].forEach(c=>c.classList.remove("active"));
+  [...locList.options].forEach(o => o.selected = false);
+  [...headChipsWrap.querySelectorAll(".chip-toggle.active")].forEach(c => c.classList.remove("active"));
   applyFilters();
 });
 
